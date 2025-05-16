@@ -1,14 +1,14 @@
-package domain.model
+package data.dto
 
-import data.dto.MenuDTO
+import domain.model.Menu
 
-data class Menu(
+data class MenuDTO(
     val id: Int,
     val name: String,
     val price: Int
 ) {
-    fun toDTO(): MenuDTO {
-        return MenuDTO(
+    fun toDomain(): Menu {
+        return Menu(
             id = this.id,
             name = this.name,
             price = this.price
