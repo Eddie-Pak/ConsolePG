@@ -1,4 +1,9 @@
 package data.datasource
 
-class MenuDataSource {
+import data.dto.MenuDTO
+
+interface MenuDataSource {
+    fun getMenuData(): List<MenuDTO>
+
+    fun saveMenuData(menuDto: List<MenuDTO>): Boolean
 }
