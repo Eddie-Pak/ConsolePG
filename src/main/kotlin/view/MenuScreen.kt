@@ -21,7 +21,11 @@ class MenuScreen(
 
                 homeScreen?.let { ConsoleController.currentScreen = it }
             }
+
             "1" -> getAllMenu()
+
+            "2" -> addMenu()
+
             else -> println("잘못된 입력")
         }
     }
@@ -41,8 +45,32 @@ class MenuScreen(
                 println("${i+1}. ${menu.name} - ${menu.price}원")
             }
 
-            println("엔터키를 누르면 돌아갑니다.")
+            print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
             readlnOrNull()
         }
+    }
+
+    private fun addMenu() {
+        println("\n======== 메뉴 추가 ========")
+
+        try {
+            print("메뉴이름을 입력해주세요: ")
+            val menuName = readlnOrNull() ?: ""
+            require(menuName.isNotEmpty()) {"\n메뉴이름을 입력해주세요.\n"}
+
+            print("메뉴가격을 입력해주세요: ")
+            val price = readlnOrNull()?.toIntOrNull()
+            require(price != null && price > 0) {"\n올바른 가격을 입력해주세요.\n"}
+
+            val addMenu = viewModel.addMenu(menuName, price)
+
+            println("${addMenu.name}을(를) 메뉴에 추가 하였습니다.")
+            println()
+        } catch (e: Exception) {
+            println("오류: ${e.message}")
+        }
+
+        print("엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        readlnOrNull()
     }
 }
