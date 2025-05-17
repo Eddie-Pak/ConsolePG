@@ -26,6 +26,8 @@ class MenuScreen(
 
             "2" -> addMenu()
 
+            "3" -> updateMenu()
+
             else -> println("잘못된 입력")
         }
     }
@@ -71,6 +73,49 @@ class MenuScreen(
         }
 
         print("엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        readlnOrNull()
+    }
+
+    private fun updateMenu() {
+        println("\n======== 메뉴 수정 ========")
+
+        val menuList = viewModel.getMenuList()
+
+        if (menuList.isEmpty()) {
+            println("수정할 메뉴가 없습니다.")
+            println()
+        } else {
+            println()
+
+            for (i in menuList.indices) {
+                val menu = menuList[i]
+                println("${i + 1}. ${menu.name} - ${menu.price}원")
+            }
+
+            try {
+                print("수정할 메뉴: ")
+                val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
+                require(menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
+
+                val selectedMenu = menuList[menuIndex - 1]
+
+                println("\n선태한 메뉴: ${selectedMenu.name} - ${selectedMenu.price}원")
+
+                print("새 가격: ")
+                val newPrice = readlnOrNull()?.toIntOrNull()
+                require(newPrice != null && newPrice > 0) {"올바른 가격을 입력해 주세요."}
+
+                val updateMenu = viewModel.updateMenu(selectedMenu.id, newPrice)
+
+                println("\n메뉴가 수정되었습니다.")
+                println("${updateMenu.name}: ${selectedMenu.price}원 -> ${updateMenu.price}원")
+
+            } catch (e: Exception) {
+                println("오류: ${e.message}")
+            }
+        }
+
+        print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
         readlnOrNull()
     }
 }
