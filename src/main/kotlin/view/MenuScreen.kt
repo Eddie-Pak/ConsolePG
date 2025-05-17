@@ -4,7 +4,7 @@ import view.model.MenuViewModel
 
 class MenuScreen(
     private val viewModel: MenuViewModel,
-    private val homeScreen: HomeScreen? = null
+    private val getHomeScreen: () -> HomeScreen? = { null }
 ) : BaseScreen {
     override fun display() {
         println("======== 메뉴 관리 ========")
@@ -19,7 +19,7 @@ class MenuScreen(
                 println("          홈 이동          ")
                 println("==========================")
 
-                homeScreen?.let { ConsoleController.currentScreen = it }
+                getHomeScreen()?.let { ConsoleController.currentScreen = it }
             }
 
             "1" -> getAllMenu()

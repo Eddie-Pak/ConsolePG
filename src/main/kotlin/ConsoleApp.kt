@@ -15,11 +15,10 @@ class ConsoleApp {
         val menuRepository: MenuRepository = MenuRepositoryImpl(menuDataSource)
         val menuViewModel = MenuViewModel(menuRepository)
 
-        val tempsHomeScreen = HomeScreen(MenuScreen(menuViewModel))
+        var homeScreen: HomeScreen? = null
+        val menuScreen = MenuScreen(menuViewModel) { homeScreen }
 
-        val menuScreen = MenuScreen(menuViewModel, tempsHomeScreen)
-
-        val homeScreen = HomeScreen(menuScreen)
+        homeScreen = HomeScreen(menuScreen)
 
         ConsoleController().start(homeScreen)
     }
