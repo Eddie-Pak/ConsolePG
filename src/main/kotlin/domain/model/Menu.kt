@@ -15,3 +15,9 @@ data class Menu(
         )
     }
 }
+
+fun List<Menu>.formatForDisplay(): String {
+    return this.mapIndexed() { index, menu ->
+        "${index + 1}. ${menu.name} - ${menu.price}원"
+    }.joinToString("\n")
+}

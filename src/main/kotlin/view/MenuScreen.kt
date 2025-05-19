@@ -1,5 +1,6 @@
 package view
 
+import domain.model.formatForDisplay
 import view.model.MenuViewModel
 
 class MenuScreen(
@@ -43,11 +44,7 @@ class MenuScreen(
             println("등로된 메뉴가 없습니다.")
             println()
         } else {
-            for (i in menuList.indices) {
-                val menu = menuList[i]
-
-                println("${i+1}. ${menu.name} - ${menu.price}원")
-            }
+            println(menuList.formatForDisplay())
 
             print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
             readlnOrNull()
@@ -80,6 +77,7 @@ class MenuScreen(
 
     private fun updateMenu() {
         println("\n======== 메뉴 수정 ========")
+        println()
 
         val menuList = viewModel.getMenuList()
 
@@ -87,21 +85,16 @@ class MenuScreen(
             println("수정할 메뉴가 없습니다.")
             println()
         } else {
-            println()
-
-            for (i in menuList.indices) {
-                val menu = menuList[i]
-                println("${i + 1}. ${menu.name} - ${menu.price}원")
-            }
+            println(menuList.formatForDisplay())
 
             try {
-                print("수정할 메뉴 번호: ")
+                print("\n수정할 메뉴 번호: ")
                 val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
                 require(menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
 
                 val selectedMenu = menuList[menuIndex - 1]
 
-                println("\n선태한 메뉴: ${selectedMenu.name} - ${selectedMenu.price}원")
+                println("\n선택한 메뉴: ${selectedMenu.name} - ${selectedMenu.price}원")
 
                 print("새 가격: ")
                 val newPrice = readlnOrNull()?.toIntOrNull()
@@ -131,13 +124,10 @@ class MenuScreen(
             println("삭제할 메뉴가 없습니다.")
             println()
         } else {
-            for (i in menuList.indices) {
-                val menu = menuList[i]
-                println("${i + 1}. ${menu.name} - ${menu.price}원")
-            }
+            println(menuList.formatForDisplay())
 
             try {
-                println("삭제할 메뉴 번호:")
+                print("\n삭제할 메뉴 번호:")
                 val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
                 require(menuIndex in 1..menuList.size) {"유효한 번호를 입력하세요."}
 
