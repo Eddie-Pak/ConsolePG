@@ -11,6 +11,7 @@ class HomeScreen(private val navigate: Navigator) : BaseScreen {
     }
 
     override fun handleInput() {
+        print("\n선택 번호: ")
         when (readlnOrNull()) {
             "1" -> navigate.navigateTo(ScreenType.Menu)
 
