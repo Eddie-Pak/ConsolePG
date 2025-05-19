@@ -1,10 +1,10 @@
 package view
 
 import view.model.MenuViewModel
-import view.model.OrderViewModel
+import view.model.StoreViewModel
 
 class StoreScreen(
-    private val orderViewModel: OrderViewModel,
+    private val storeViewModel: StoreViewModel,
     private val menuViewModel: MenuViewModel,
     private val getHomeScreen: () -> HomeScreen? = { null }
 ) : BaseScreen {
