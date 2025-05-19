@@ -28,6 +28,8 @@ class MenuScreen(
 
             "3" -> updateMenu()
 
+            "4" -> deleteMenu()
+
             else -> println("잘못된 입력")
         }
     }
@@ -93,7 +95,7 @@ class MenuScreen(
             }
 
             try {
-                print("수정할 메뉴: ")
+                print("수정할 메뉴 번호: ")
                 val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
                 require(menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
 
@@ -117,5 +119,43 @@ class MenuScreen(
 
         print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
         readlnOrNull()
+    }
+
+    private fun deleteMenu() {
+        println("\n======== 메뉴 목록 ========")
+        println()
+
+        val menuList = viewModel.getMenuList()
+
+        if (menuList.isEmpty()) {
+            println("삭제할 메뉴가 없습니다.")
+            println()
+        } else {
+            for (i in menuList.indices) {
+                val menu = menuList[i]
+                println("${i + 1}. ${menu.name} - ${menu.price}원")
+            }
+
+            try {
+                println("삭제할 메뉴 번호:")
+                val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
+                require(menuIndex in 1..menuList.size) {"유효한 번호를 입력하세요."}
+
+                val selectMenu = menuList[menuIndex - 1]
+
+                println("${selectMenu.name} 을(를) 삭제합니다.")
+                println("삭 제 중.......")
+
+                if (viewModel.deleteMenu(selectMenu.id)) {
+                    println("\n${selectMenu.name} 을(를) 삭제하였습니다.")
+                }
+
+            } catch (e: Exception) {
+                println("오류: ${e.message}")
+            }
+
+            print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+            readlnOrNull()
+        }
     }
 }
