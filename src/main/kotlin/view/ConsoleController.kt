@@ -1,15 +1,12 @@
 package view
 
-class ConsoleController {
+import navigate.Navigator
 
-    companion object {
-        lateinit var currentScreen: BaseScreen
-    }
-
-    fun start(screen: BaseScreen) {
-        currentScreen = screen
-
+class ConsoleController(private val navigate: Navigator) {
+    fun start() {
         while (true) {
+            val currentScreen = navigate.getCurrentScreen()
+
             currentScreen.display()
             currentScreen.handleInput()
         }

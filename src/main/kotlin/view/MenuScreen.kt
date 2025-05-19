@@ -1,11 +1,13 @@
 package view
 
 import domain.model.formatForDisplay
+import navigate.Navigator
+import navigate.ScreenType
 import view.model.MenuViewModel
 
 class MenuScreen(
-    private val viewModel: MenuViewModel,
-    private val getHomeScreen: () -> HomeScreen? = { null }
+    private val navigate: Navigator,
+    private val viewModel: MenuViewModel
 ) : BaseScreen {
     override fun display() {
         println("======== 메뉴 관리 ========")
@@ -20,7 +22,7 @@ class MenuScreen(
                 println("          홈 이동          ")
                 println("==========================")
 
-                getHomeScreen()?.let { ConsoleController.currentScreen = it }
+                navigate.navigateTo(ScreenType.Home)
             }
 
             "1" -> getAllMenu()

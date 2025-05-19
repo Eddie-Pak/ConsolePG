@@ -1,8 +1,10 @@
 package view
 
+import navigate.Navigator
+import navigate.ScreenType
 import kotlin.system.exitProcess
 
-class HomeScreen(private val menuScreen: MenuScreen) : BaseScreen {
+class HomeScreen(private val navigate: Navigator) : BaseScreen {
     override fun display() {
         println("Welcome")
         println("[1] 메뉴관리 [2]매장관리 [0] 종료")
@@ -10,7 +12,7 @@ class HomeScreen(private val menuScreen: MenuScreen) : BaseScreen {
 
     override fun handleInput() {
         when (readlnOrNull()) {
-            "1" -> ConsoleController.currentScreen = menuScreen
+            "1" -> navigate.navigateTo(ScreenType.Menu)
 
             "2" -> {}
 
