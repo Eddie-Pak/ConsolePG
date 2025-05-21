@@ -14,6 +14,9 @@ class AppNavigator: Navigator {
 
     private val menuDataSource: MenuDataSource = MenuDataSourceImpl()
     private val menuRepository: MenuRepository = MenuRepositoryImpl(menuDataSource)
+
+
+
     private val menuViewModel = MenuViewModel(menuRepository)
 
     private val homeScreen = HomeScreen(this)
@@ -27,6 +30,7 @@ class AppNavigator: Navigator {
         currentScreen = when (screenType) {
             ScreenType.Home -> homeScreen
             ScreenType.Menu -> menuScreen
+            ScreenType.Store -> TODO()
         }
     }
 
