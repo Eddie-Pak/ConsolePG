@@ -43,14 +43,14 @@ class MenuScreen(
         val menuList = viewModel.getMenuList()
 
         if (menuList.isEmpty()) {
-            println("등로된 메뉴가 없습니다.")
+            println("등록된 메뉴가 없습니다.")
             println()
         } else {
             println(menuList.formatForDisplay())
-
-            print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
-            readlnOrNull()
         }
+
+        print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        readlnOrNull()
     }
 
     private fun addMenu() {
