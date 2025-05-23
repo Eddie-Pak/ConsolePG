@@ -15,7 +15,7 @@ class HomeScreen(private val navigate: Navigator) : BaseScreen {
         when (readlnOrNull()) {
             "1" -> navigate.navigateTo(ScreenType.Menu)
 
-            "2" -> {}
+            "2" -> navigate.navigateTo(ScreenType.Store)
 
             "0" -> exitProcess(0)
             else -> println("잘못된 선택")
