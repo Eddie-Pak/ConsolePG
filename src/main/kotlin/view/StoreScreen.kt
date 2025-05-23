@@ -12,7 +12,7 @@ class StoreScreen(
 ) : BaseScreen {
     override fun display() {
         println("======== 메장 관리 ========")
-        println("1.주문확인 2.주문하기 0.홈이동")
+        println("1.주문확인 2.주문하기 3.주문수정 0.홈이동")
         println("==========================")
     }
 
@@ -29,6 +29,8 @@ class StoreScreen(
             "1" -> checkOrders()
 
             "2" -> addOrder()
+
+            "3" -> updateOrder()
 
             else -> {}
         }
@@ -99,7 +101,82 @@ class StoreScreen(
             readlnOrNull()
         } catch (e: Exception) {
             println("${e.message}")
+            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+            readlnOrNull()
         }
+    }
+
+    private fun updateOrder() {
+        println("\n======== 주문 수정 ========")
+
+        try {
+            print("\n테이블번호(1~7): ")
+            val tableNumber = readln().toIntOrNull()
+            require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해 주세요."}
+
+            val currentOrder = viewModel.getOrderByTable(tableNumber)
+
+            if (currentOrder == null) {
+                println("${tableNumber}번 테이블에 미결제 주문이 없습니다.")
+                print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+                readlnOrNull()
+                return
+            }
+
+            println("\n=== ${tableNumber}번 테이블 현재 주문 ===")
+
+            val menuList = currentOrder.menuItems.entries.toList()
+            menuList.forEachIndexed { index, (menu, quantity) ->
+                println("${index + 1}. ${menu.name} - ${quantity}개")
+            }
+
+            print("\n수정할 메뉴 번호 (1~${menuList.size}): ")
+            val menuIndex = readln().toIntOrNull()
+            require(menuIndex != null && menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
+
+            val selectedMenu = menuList[menuIndex - 1]
+            val menu = selectedMenu.key
+            val currentQuantity = selectedMenu.value
+
+            println("\n선택한 메뉴: ${menu.name} (현재 수량: ${currentQuantity}개)")
+            print("새로운 수량 (0 입력시 삭제): ")
+
+            val newQuantity = readln().toIntOrNull()
+            require(newQuantity != null && newQuantity >= 0) {"올바른 수량을 입력해주세요. (0 이상)"}
+
+            val updatedOrder = viewModel.updateOrder(tableNumber, menu.id, newQuantity)
+
+            if (updatedOrder == null) {
+                println("\n${tableNumber}번 테이블의 모든 주문이 취소되었습니다.")
+            } else {
+                println("\n=== 주문이 수정되었습니다 ===")
+
+                if (newQuantity == 0) {
+                    println("${menu.name}이(가) 주문에서 제거되었습니다.")
+                } else {
+                    println("${menu.name}: ${currentQuantity}개 → ${newQuantity}개")
+                }
+
+                println("\n=== 수정된 주문 내역 ===")
+                updatedOrder.menuItems.forEach { (updatedMenu, quantity) ->
+                    println("${updatedMenu.name} - ${quantity}개")
+                }
+
+                val newTotalPrice = updatedOrder.menuItems.entries.sumOf { (updatedMenu, quantity) ->
+                    updatedMenu.price * quantity
+                }
+                println("\n새로운 총 금액: ${newTotalPrice}원")
+            }
+
+            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+            readlnOrNull()
+
+        } catch (e: Exception) {
+            println("오류: ${e.message}")
+            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+            readlnOrNull()
+        }
+
     }
 
     private fun parseOrder(input: String, menuList: List<Menu>): Map<Int, Int> {

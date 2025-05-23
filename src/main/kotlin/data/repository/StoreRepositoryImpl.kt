@@ -17,6 +17,15 @@ class StoreRepositoryImpl(
         return storeDataSource.getOrderData().map { dto -> dto.toDomain(allMenu) }
     }
 
+    override fun getOrderByTable(tableNumber: Int): Order? {
+        val allMenu = getAllMenu()
+        val orderDto = storeDataSource.getOrderData().find {
+            it.tableNumber == tableNumber && !it.isPaid
+        }
+
+        return orderDto?.toDomain(allMenu)
+    }
+
     override fun addOrder(tableNumber: Int, menuItems: Map<Int, Int>): Order {
         val allMenu = getAllMenu()
         val orderDtoList = storeDataSource.getOrderData().toMutableList()
@@ -59,6 +68,39 @@ class StoreRepositoryImpl(
             storeDataSource.saveOrderData(orderDtoList)
 
             return newOrder
+        }
+    }
+
+    override fun updateOrder(tableNumber: Int, menuId: Int, newQuantity: Int): Order? {
+        val allMenu = getAllMenu()
+        val orderDtoList = storeDataSource.getOrderData().toMutableList()
+
+        val orderIndex = orderDtoList.indexOfFirst {
+            it.tableNumber == tableNumber && !it.isPaid
+        }
+
+        val existingOrder = orderDtoList[orderIndex]
+        val updatedMenuItems = existingOrder.menuItemId.toMutableMap()
+
+        if (newQuantity <= 0) {
+            updatedMenuItems.remove(menuId)
+        } else {
+            updatedMenuItems[menuId] = newQuantity
+        }
+
+        if (updatedMenuItems.isEmpty()) {
+            orderDtoList.removeAt(orderIndex)
+        } else {
+            val updatedOrder = existingOrder.copy(menuItemId = updatedMenuItems)
+            orderDtoList[orderIndex] = updatedOrder
+        }
+
+        storeDataSource.saveOrderData(orderDtoList)
+
+        return if (updatedMenuItems.isEmpty()) {
+            null
+        } else {
+            orderDtoList[orderIndex].toDomain(allMenu)
         }
     }
 }

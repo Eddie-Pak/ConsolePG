@@ -8,5 +8,9 @@ interface StoreRepository {
 
     fun getOrders(): List<Order>
 
+    fun getOrderByTable(tableNumber: Int): Order?
+
     fun addOrder(tableNumber: Int, menuItems: Map<Int, Int>): Order
+
+    fun updateOrder(tableNumber: Int, menuId: Int, newQuantity: Int): Order?
 }

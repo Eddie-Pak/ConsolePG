@@ -42,7 +42,7 @@ fun List<Order>.formatForDisplay(): String {
             "${menu.name} - ${quantity}개"
         }
 
-        "$tableHeader\n$menuDetails\n\n총가격: ${totalTablePrice}원"
+        "$tableHeader\n$menuDetails\n\n총가격: ${totalTablePrice}원\n"
     }
 
     return orderByTable
