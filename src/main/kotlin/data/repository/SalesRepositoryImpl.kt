@@ -75,4 +75,45 @@ class SalesRepositoryImpl(
 
         return sales
     }
+
+    override fun getMonthlySales(year: Int): Map<Int, Int> {
+        val allSales = getAllSales()
+
+        val monthlySales = allSales
+            .filter { it.paymentDate.year == year }
+            .groupBy { it.paymentDate.monthValue }
+            .mapValues { (_, salesList) ->
+                salesList.sumOf { it.totalAmount }
+            }
+
+        return monthlySales
+    }
+
+    override fun getDailySales(year: Int, month: Int): Map<Int, Int> {
+        val allSales = getAllSales()
+
+        val dailySales = allSales
+            .filter { it.paymentDate.year == year && it.paymentDate.monthValue == month }
+            .groupBy { it.paymentDate.dayOfMonth }
+            .mapValues { (_, salesList) ->
+                salesList.sumOf { it.totalAmount }
+            }
+
+        return dailySales
+    }
+
+    override fun getMenuSales(year: Int): Map<Menu, Int> {
+        val allSales = getAllSales()
+        val menuSalesCount = mutableMapOf<Menu, Int>()
+
+        allSales
+            .filter { it.paymentDate.year == year }
+            .forEach { sales ->
+                sales.menuItems.forEach { (menu, quantity) ->
+                    menuSalesCount[menu] = (menuSalesCount[menu] ?: 0) + quantity
+                }
+            }
+
+        return menuSalesCount
+    }
 }

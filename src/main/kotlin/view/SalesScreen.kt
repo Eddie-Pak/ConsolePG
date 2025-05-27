@@ -3,6 +3,7 @@ package view
 import navigate.Navigator
 import navigate.ScreenType
 import view.model.SalesViewModel
+import java.time.LocalDate
 
 class SalesScreen(
     private val navigate: Navigator,
@@ -10,7 +11,7 @@ class SalesScreen(
 ) : BaseScreen {
     override fun display() {
         println("======== 메출 관리 ========")
-        println("1. 결제하기 0. 홈이동")
+        println("1.결제하기 2.매출확인 0. 홈이동")
         println("==========================")
     }
 
@@ -25,6 +26,8 @@ class SalesScreen(
             }
 
             "1" -> processPayment()
+
+            "2" -> showSalesReport()
 
             else -> println("잘못된 입력입니다. 다시 선택해주세요.")
         }
@@ -97,5 +100,121 @@ class SalesScreen(
         } catch (e: Exception) {
             println("오류: ${e.message}")
         }
+    }
+
+    private fun showSalesReport() {
+        println("\n======== 매출 확인 ========")
+        println("1.월별매출 2.일별매출 3.메뉴별매출")
+        println("==========================")
+
+        when (readlnOrNull()) {
+            "1" -> showMonthlySales()
+
+            "2" -> showDailySales()
+
+            "3" -> showMenuSales()
+
+            else -> println("잘못된 입력입니다.")
+        }
+    }
+
+    private fun showMonthlySales() {
+        val currentYear = LocalDate.now().year
+        val currentMonth = LocalDate.now().monthValue
+        val monthlySales = viewModel.getMonthlySales(currentYear)
+
+        println("\n======== ${currentYear}년 월별 매출 (1월~${currentMonth}월) ========")
+
+        if (monthlySales.isEmpty()) {
+            println("${currentYear}년 매출 데이터가 없습니다.")
+        } else {
+            var totalYearToDateSales = 0
+
+            for (month in 1..currentMonth) {
+                val sales = monthlySales[month] ?: 0
+                totalYearToDateSales += sales
+                println("${month}월: ${String.format("%,d", sales)}원")
+            }
+
+            println("\n${currentYear}년 ${currentMonth}월까지 총 매출: ${String.format("%,d", totalYearToDateSales)}원")
+        }
+
+        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        readlnOrNull()
+    }
+
+    private fun showDailySales() {
+        val currentYear = LocalDate.now().year
+        val currentMonth = LocalDate.now().monthValue
+
+        println("\n======== 일별 매출 조회 ========")
+        println("조회 가능한 월: 1월 ~ ${currentMonth}월")
+        print("조회할 월을 입력하세요 (1~${currentMonth}): ")
+
+        try {
+            val selectedMonth = readln().toIntOrNull()
+            require(selectedMonth != null && selectedMonth in 1..currentMonth) {
+                "1월부터 ${currentMonth}월까지만 선택 가능합니다."
+            }
+
+            val dailySales = viewModel.getDailySales(currentYear, selectedMonth)
+
+            println("\n======== ${currentYear}년 ${selectedMonth}월 일별 매출 ========")
+
+            if (dailySales.isEmpty()) {
+                println("${currentYear}년 ${selectedMonth}월 매출 데이터가 없습니다.")
+            } else {
+                val totalMonthSales = dailySales.values.sum()
+                val sortedDailySales = dailySales.toSortedMap()
+
+                val lastDayOfMonth = when (selectedMonth) {
+                    4, 6, 9, 11 -> 30
+                    2 -> if (currentYear % 4 == 0 && (currentYear % 100 != 0 || currentYear % 400 == 0)) 29 else 28
+                    else -> 31
+                }
+
+                for (startDay in 1..lastDayOfMonth step 7) {
+                    val endDay = minOf(startDay + 6, lastDayOfMonth)
+                    val weekSales = mutableListOf<String>()
+
+                    for (day in startDay..endDay) {
+                        val sales = sortedDailySales[day] ?: 0
+                        weekSales.add("${day}일: ${String.format("%,d", sales)}원")
+                    }
+
+                    println(weekSales.joinToString(" | "))
+                }
+
+                println("\n${currentYear}년 ${selectedMonth}월 총 매출: ${String.format("%,d", totalMonthSales)}원")
+            }
+        } catch (e: Exception) {
+            println("오류: ${e.message}")
+        }
+
+        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        readlnOrNull()
+    }
+
+    private fun showMenuSales() {
+        val currentYear = LocalDate.now().year
+        val menuSales = viewModel.getMenuSales(currentYear)
+
+        println("\n======== ${currentYear}년 메뉴별 판매량 ========")
+
+        if (menuSales.isEmpty()) {
+            println("${currentYear}년 메뉴 판매 데이터가 없습니다.")
+        } else {
+            val sortedMenuSales = menuSales.toList().sortedByDescending { it.second }
+
+            var rank = 1
+            sortedMenuSales.forEach { (menu, quantity) ->
+                val totalRevenue = menu.price * quantity
+                println("${rank}위. ${menu.name} - 판매량:${quantity}개 / 총매출: ${String.format("%,d", totalRevenue)}원)")
+                rank++
+            }
+        }
+
+        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        readlnOrNull()
     }
 }
