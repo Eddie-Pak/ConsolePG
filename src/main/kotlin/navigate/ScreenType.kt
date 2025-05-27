@@ -1,5 +1,5 @@
 package navigate
 
 enum class ScreenType {
-    Home, Menu, Store
+    Home, Menu, Store, Sales
 }
