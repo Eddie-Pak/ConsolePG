@@ -17,6 +17,8 @@ class StoreScreen(
     }
 
     override fun handleInput() {
+        print("\n선택 번호: ")
+
         when (readlnOrNull()) {
             "0" -> {
                 println("==========================")

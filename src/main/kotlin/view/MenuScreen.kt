@@ -11,11 +11,13 @@ class MenuScreen(
 ) : BaseScreen {
     override fun display() {
         println("======== 메뉴 관리 ========")
-        println("1. 메뉴확인 2. 메뉴추가 3. 메뉴수정 4. 메뉴삭제 0. 홈이동")
+        println("1.메뉴확인 2.메뉴추가 3.메뉴수정 4.메뉴삭제 0.홈이동")
         println("==========================")
     }
 
     override fun handleInput() {
+        print("\n선택 번호: ")
+
         when (readlnOrNull()) {
             "0" -> {
                 println("==========================")

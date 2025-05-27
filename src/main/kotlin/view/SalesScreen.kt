@@ -16,6 +16,8 @@ class SalesScreen(
     }
 
     override fun handleInput() {
+        print("\n선택 번호: ")
+
         when (readlnOrNull()) {
             "0" -> {
                 println("==========================")
@@ -106,6 +108,8 @@ class SalesScreen(
         println("\n======== 매출 확인 ========")
         println("1.월별매출 2.일별매출 3.메뉴별매출")
         println("==========================")
+
+        print("\n선택 번호: ")
 
         when (readlnOrNull()) {
             "1" -> showMonthlySales()

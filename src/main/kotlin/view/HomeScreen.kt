@@ -6,12 +6,14 @@ import kotlin.system.exitProcess
 
 class HomeScreen(private val navigate: Navigator) : BaseScreen {
     override fun display() {
-        println("Welcome")
+        println("======== 홈 화면 ========")
         println("[1] 메뉴관리 [2]매장관리 [3]매출관리 [0] 종료")
+        println("==========================")
     }
 
     override fun handleInput() {
         print("\n선택 번호: ")
+
         when (readlnOrNull()) {
             "1" -> navigate.navigateTo(ScreenType.Menu)
 
