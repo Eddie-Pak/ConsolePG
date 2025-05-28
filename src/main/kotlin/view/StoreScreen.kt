@@ -4,6 +4,46 @@ import domain.model.Menu
 import domain.model.formatForDisplay
 import navigate.Navigator
 import navigate.ScreenType
+import resources.CommonStrings.ENTER_TO_CONTINUE
+import resources.CommonStrings.ERROR_PREFIX
+import resources.CommonStrings.HOME_NAVIGATION
+import resources.CommonStrings.INVALID_TABLE_NUMBER
+import resources.CommonStrings.SELECTION_PROMPT
+import resources.CommonStrings.SEPARATOR_LINE
+import resources.CommonStrings.TABLE_NUMBER_PROMPT
+import resources.StoreStrings.ADD_ORDER_TITLE
+import resources.StoreStrings.ALL_ORDERS_CANCELLED
+import resources.StoreStrings.CURRENT_ORDER_TITLE
+import resources.StoreStrings.MENU_DISPLAY_FORMAT
+import resources.StoreStrings.MENU_LIST_DISPLAY_FORMAT
+import resources.StoreStrings.MENU_LIST_TITLE
+import resources.StoreStrings.MENU_OPTIONS
+import resources.StoreStrings.MENU_REMOVED
+import resources.StoreStrings.NEW_QUANTITY_PROMPT
+import resources.StoreStrings.NEW_TOTAL_AMOUNT
+import resources.StoreStrings.NO_MENU_TO_ORDER
+import resources.StoreStrings.NO_UNPAID_ORDER
+import resources.StoreStrings.ORDER_CHECK_TITLE
+import resources.StoreStrings.ORDER_COMPLETE_TITLE
+import resources.StoreStrings.ORDER_INPUT_INSTRUCTION
+import resources.StoreStrings.ORDER_INPUT_REQUIRED
+import resources.StoreStrings.ORDER_PROMPT
+import resources.StoreStrings.ORDER_UPDATE_SUCCESS
+import resources.StoreStrings.QUANTITY_CHANGED
+import resources.StoreStrings.QUANTITY_MIN_REQUIRED
+import resources.StoreStrings.RETURN_TO_STORE_MANAGEMENT
+import resources.StoreStrings.SELECTED_MENU_INFO
+import resources.StoreStrings.SELECT_MENU_TO_UPDATE
+import resources.StoreStrings.TABLE_ORDER_INFO
+import resources.StoreStrings.TABLE_TOTAL_AMOUNT
+import resources.StoreStrings.TITLE
+import resources.StoreStrings.UPDATED_ORDER_TITLE
+import resources.StoreStrings.UPDATE_ORDER_TITLE
+import resources.StoreStrings.VALID_MENU_NUMBER
+import resources.StoreStrings.VALID_MENU_RANGE
+import resources.StoreStrings.VALID_ORDER_FORMAT_MESSAGE
+import resources.StoreStrings.VALID_ORDER_FORMAT_REQUIRED
+import resources.StoreStrings.VALID_QUANTITY_INPUT
 import view.model.StoreViewModel
 
 class StoreScreen(
@@ -11,19 +51,19 @@ class StoreScreen(
     private val viewModel: StoreViewModel
 ) : BaseScreen {
     override fun display() {
-        println("======== 메장 관리 ========")
-        println("1.주문확인 2.주문하기 3.주문수정 0.홈이동")
-        println("==========================")
+        println(TITLE)
+        println(MENU_OPTIONS)
+        println(SEPARATOR_LINE)
     }
 
     override fun handleInput() {
-        print("\n선택 번호: ")
+        print("\n$SELECTION_PROMPT")
 
         when (readlnOrNull()) {
             "0" -> {
-                println("==========================")
-                println("          홈 이동          ")
-                println("==========================")
+                println(SEPARATOR_LINE)
+                println(HOME_NAVIGATION)
+                println(SEPARATOR_LINE)
 
                 navigate.navigateTo(ScreenType.Home)
             }
@@ -39,52 +79,50 @@ class StoreScreen(
     }
 
     private fun checkOrders() {
-        println("\n======== 주문 확인 ========")
+        println("\n$ORDER_CHECK_TITLE")
 
         val orders = viewModel.getAllOrder()
 
         println(orders.formatForDisplay())
 
-        print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_STORE_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun addOrder() {
-        println("\n======== 주문 하기 ========")
+        println("\n$ADD_ORDER_TITLE")
 
         val menuList = viewModel.getMenuList()
 
         if (menuList.isEmpty()) {
-            println("주문 가능한 메뉴가 없습니다.")
+            println(NO_MENU_TO_ORDER)
         } else {
             try {
-                print("\n테이블 번호 (1~7): ")
+                print("\n$TABLE_NUMBER_PROMPT")
                 val tableNumber = readln().toIntOrNull()
-                require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해 주세요."}
+                require(tableNumber != null && tableNumber in 1..7) {INVALID_TABLE_NUMBER}
 
-                println("\n=== 메뉴 목록 ===")
-                menuList.forEachIndexed { index, menu ->
-                    println("${index + 1}. ${menu.name} - ${menu.price}원")
-                }
+                println("\n$MENU_LIST_TITLE")
+                println(menuList.formatForDisplay())
 
-                println("\n주문을 입력해주세요. 형식: 메뉴번호-수량, 메뉴번호-수량 (예: 1-2, 3-1)")
-                print("${tableNumber}번 테이블 주문: ")
+                println("\n$ORDER_INPUT_INSTRUCTION")
+                print(String.format(ORDER_PROMPT, tableNumber))
 
                 val orderInput = readln()
-                require(orderInput.isNotEmpty()) { "주문을 입력해주세요." }
+                require(orderInput.isNotEmpty()) { ORDER_INPUT_REQUIRED }
 
                 val menuItems = parseOrder(orderInput, menuList)
-                require(menuItems.isNotEmpty()) { "올바른 주문 형식을 입력해주세요." }
+                require(menuItems.isNotEmpty()) { VALID_ORDER_FORMAT_REQUIRED }
 
                 val newOrder = viewModel.addOrder(tableNumber, menuItems)
 
-                println("\n=== 주문이 완료되었습니다 ===")
-                println("테이블 번호: ${newOrder.tableNumber}번 주문내용")
+                println("\n$ORDER_COMPLETE_TITLE")
+                println(String.format(TABLE_ORDER_INFO, newOrder.tableNumber))
 
                 menuItems.forEach { (menuId, quantity) ->
                     val menu = menuList.find { it.id == menuId }
                     menu?.let {
-                        println("${menu.name} - $quantity")
+                        println(String.format(MENU_DISPLAY_FORMAT, menu.name, quantity))
                     }
                 }
 
@@ -92,82 +130,82 @@ class StoreScreen(
                     menu.price * quantity
                 }
 
-                println("\n테이블 총 금액: ${totalPrice}원")
+                println("\n${String.format(TABLE_TOTAL_AMOUNT, totalPrice)}")
             } catch (e: Exception) {
-                println("${e.message}")
+                println(String.format(ERROR_PREFIX, e.message))
             }
         }
 
-        print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_STORE_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun updateOrder() {
-        println("\n======== 주문 수정 ========")
+        println("\n$UPDATE_ORDER_TITLE")
 
         try {
-            print("\n테이블번호(1~7): ")
+            print("\n$TABLE_NUMBER_PROMPT")
             val tableNumber = readln().toIntOrNull()
-            require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해 주세요."}
+            require(tableNumber != null && tableNumber in 1..7) {INVALID_TABLE_NUMBER}
 
             val currentOrder = viewModel.getOrderByTable(tableNumber)
 
             if (currentOrder == null) {
-                println("${tableNumber}번 테이블에 미결제 주문이 없습니다.")
-                print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+                println(String.format(NO_UNPAID_ORDER, tableNumber))
+                print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_STORE_MANAGEMENT)}")
                 readlnOrNull()
                 return
             }
 
-            println("\n=== ${tableNumber}번 테이블 현재 주문 ===")
+            println("\n${String.format(CURRENT_ORDER_TITLE, tableNumber)}")
 
             val menuList = currentOrder.menuItems.entries.toList()
             menuList.forEachIndexed { index, (menu, quantity) ->
-                println("${index + 1}. ${menu.name} - ${quantity}개")
+                println(String.format(MENU_LIST_DISPLAY_FORMAT, index + 1, menu.name, quantity))
             }
 
-            print("\n수정할 메뉴 번호 (1~${menuList.size}): ")
+            print("\n${String.format(SELECT_MENU_TO_UPDATE, menuList.size)}")
             val menuIndex = readln().toIntOrNull()
-            require(menuIndex != null && menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
+            require(menuIndex != null && menuIndex in 1..menuList.size) {VALID_MENU_NUMBER}
 
             val selectedMenu = menuList[menuIndex - 1]
             val menu = selectedMenu.key
             val currentQuantity = selectedMenu.value
 
-            println("\n선택한 메뉴: ${menu.name} (현재 수량: ${currentQuantity}개)")
-            print("새로운 수량 (0 입력시 삭제): ")
+            println("\n${String.format(SELECTED_MENU_INFO, menu.name, currentQuantity)}")
+            print(NEW_QUANTITY_PROMPT)
 
             val newQuantity = readln().toIntOrNull()
-            require(newQuantity != null && newQuantity >= 0) {"올바른 수량을 입력해주세요. (0 이상)"}
+            require(newQuantity != null && newQuantity >= 0) {VALID_QUANTITY_INPUT}
 
             val updatedOrder = viewModel.updateOrder(tableNumber, menu.id, newQuantity)
 
             if (updatedOrder == null) {
-                println("\n${tableNumber}번 테이블의 모든 주문이 취소되었습니다.")
+                println("\n${String.format(ALL_ORDERS_CANCELLED, tableNumber)}")
             } else {
-                println("\n=== 주문이 수정되었습니다 ===")
+                println("\n$ORDER_UPDATE_SUCCESS")
 
                 if (newQuantity == 0) {
-                    println("${menu.name}이(가) 주문에서 제거되었습니다.")
+                    println(String.format(MENU_REMOVED, menu.name))
                 } else {
-                    println("${menu.name}: ${currentQuantity}개 → ${newQuantity}개")
+                    println(String.format(QUANTITY_CHANGED, menu.name, currentQuantity, newQuantity))
                 }
 
-                println("\n=== 수정된 주문 내역 ===")
+                println("\n$UPDATED_ORDER_TITLE")
                 updatedOrder.menuItems.forEach { (updatedMenu, quantity) ->
-                    println("${updatedMenu.name} - ${quantity}개")
+                    println(String.format(MENU_DISPLAY_FORMAT, updatedMenu.name, quantity))
                 }
 
                 val newTotalPrice = updatedOrder.menuItems.entries.sumOf { (updatedMenu, quantity) ->
                     updatedMenu.price * quantity
                 }
-                println("\n새로운 총 금액: ${newTotalPrice}원")
+                println("\n${String.format(NEW_TOTAL_AMOUNT, newTotalPrice)}")
             }
         } catch (e: Exception) {
-            println("오류: ${e.message}")
+            println(String.format(ERROR_PREFIX, e.message))
         }
 
-        print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_STORE_MANAGEMENT)}")
         readlnOrNull()
     }
 
@@ -178,16 +216,16 @@ class StoreScreen(
 
         for (order in orders) {
             val parts = order.split("-").map { it.trim() }
-            require(parts.size == 2) {"메뉴를 올바른형식으로 입력해주세요."}
+            require(parts.size == 2) {VALID_ORDER_FORMAT_MESSAGE}
 
             val menuIndex = parts[0].toIntOrNull()
             val quantity = parts[1].toIntOrNull()
 
             require(menuIndex != null && menuIndex in 1..menuList.size) {
-                "유효한 메뉴 번호(1-${menuList.size})를 형식에 맞게 입력해주세요."
+                String.format(VALID_MENU_RANGE, menuList.size)
             }
 
-            require(quantity != null && quantity > 0) { "수량은 1 이상이어야 합니다." }
+            require(quantity != null && quantity > 0) { QUANTITY_MIN_REQUIRED }
 
             val menuId = menuList[menuIndex - 1].id
 

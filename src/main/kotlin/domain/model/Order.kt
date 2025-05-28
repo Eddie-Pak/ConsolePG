@@ -1,6 +1,10 @@
 package domain.model
 
 import data.dto.OrderDTO
+import resources.StoreStrings.MENU_DISPLAY_FORMAT
+import resources.StoreStrings.NO_ORDERS_MESSAGE
+import resources.StoreStrings.TABLE_ORDER_HEADER
+import resources.StoreStrings.TABLE_TOTAL_PRICE
 
 data class Order(
     val id: Int,
@@ -20,13 +24,13 @@ data class Order(
 
 fun List<Order>.formatForDisplay(): String {
     if (this.isEmpty()) {
-        return "현재 모든 테이블에 주문이 없습니다."
+        return NO_ORDERS_MESSAGE
     }
 
     val groupByTable = this.groupBy { it.tableNumber }
 
     val orderByTable = groupByTable.entries.sortedBy { it.key }.joinToString("\n") { (tableNumber, orders) ->
-        val tableHeader = "=${tableNumber}번 테이블="
+        val tableHeader = String.format(TABLE_ORDER_HEADER, tableNumber)
 
         val allMenuItems = mutableMapOf<Menu, Int>()
         var totalTablePrice = 0
@@ -39,10 +43,12 @@ fun List<Order>.formatForDisplay(): String {
         }
 
         val menuDetails = allMenuItems.entries.joinToString("\n") { (menu, quantity) ->
-            "${menu.name} - ${quantity}개"
+            String.format(MENU_DISPLAY_FORMAT, menu.name, quantity)
         }
 
-        "$tableHeader\n$menuDetails\n\n총가격: ${totalTablePrice}원\n"
+        val totalTablePriceString = String.format(TABLE_TOTAL_PRICE, totalTablePrice)
+
+        "$tableHeader\n$menuDetails\n\n$totalTablePriceString\n"
     }
 
     return orderByTable
