@@ -93,11 +93,11 @@ class MenuScreen(
         try {
             print(ENTER_MENU_NAME)
             val menuName = readlnOrNull() ?: ""
-            require(menuName.isNotEmpty()) { "\n$MENU_NAME_REQUIRED\n" }
+            require(menuName.isNotEmpty()) { MENU_NAME_REQUIRED }
 
             print(ENTER_MENU_PRICE)
             val price = readln().toIntOrNull()
-            require(price != null && price > 0) { "\n$VALID_PRICE_REQUIRED\n" }
+            require(price != null && price > 0) { VALID_PRICE_REQUIRED }
 
             val addMenu = viewModel.addMenu(menuName, price)
 
@@ -126,7 +126,7 @@ class MenuScreen(
             try {
                 print("\n$SELECT_MENU_TO_UPDATE")
                 val menuIndex = readln().toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) { "\n$VALID_MENU_NUMBER_REQUIRED\n" }
+                require(menuIndex in 1..menuList.size) { VALID_MENU_NUMBER_REQUIRED }
 
                 val selectedMenu = menuList[menuIndex - 1]
 
@@ -134,7 +134,7 @@ class MenuScreen(
 
                 print(ENTER_NEW_PRICE)
                 val newPrice = readln().toIntOrNull()
-                require(newPrice != null && newPrice > 0) { "\n$VALID_PRICE_INPUT_REQUIRED\n" }
+                require(newPrice != null && newPrice > 0) { VALID_PRICE_INPUT_REQUIRED }
 
                 val updateMenu = viewModel.updateMenu(selectedMenu.id, newPrice)
 
@@ -165,7 +165,7 @@ class MenuScreen(
             try {
                 print("\n$SELECT_MENU_TO_DELETE")
                 val menuIndex = readln().toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) { "\n$VALID_MENU_NUMBER_REQUIRED\n" }
+                require(menuIndex in 1..menuList.size) { VALID_MENU_NUMBER_REQUIRED }
 
                 val selectMenu = menuList[menuIndex - 1]
 
