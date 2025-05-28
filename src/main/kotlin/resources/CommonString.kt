@@ -4,7 +4,7 @@ object CommonStrings {
     const val HOME_NAVIGATION = "          홈 이동          "
     const val ENTER_TO_CONTINUE = "엔터키를 누르면 %s로 돌아갑니다."
     const val INVALID_INPUT = "잘못된 입력입니다."
-    const val INVALID_SELECTION = "잘못된 선택입니다."
+    const val INVALID_SELECTION = "잘못된 선택입니다. 다시 입력해주세요."
     const val ERROR_PREFIX = "오류: %s"
     const val SEPARATOR_LINE = "=========================="
     const val TABLE_NUMBER_PROMPT = "테이블 번호 (1~7): "

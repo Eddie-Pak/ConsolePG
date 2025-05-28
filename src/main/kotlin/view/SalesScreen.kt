@@ -2,6 +2,46 @@ package view
 
 import navigate.Navigator
 import navigate.ScreenType
+import resources.CommonStrings.ENTER_TO_CONTINUE
+import resources.CommonStrings.ERROR_PREFIX
+import resources.CommonStrings.HOME_NAVIGATION
+import resources.CommonStrings.INVALID_SELECTION
+import resources.CommonStrings.INVALID_TABLE_NUMBER
+import resources.CommonStrings.SELECTION_PROMPT
+import resources.CommonStrings.SEPARATOR_LINE
+import resources.SalesStrings.AVAILABLE_MONTHS
+import resources.SalesStrings.DAILY_SALES_FORMAT
+import resources.SalesStrings.DAILY_SALES_HEADER
+import resources.SalesStrings.DAILY_SALES_TITLE
+import resources.SalesStrings.MENU_BODY
+import resources.SalesStrings.MENU_NAME_AMOUNT
+import resources.SalesStrings.MENU_OPTIONS
+import resources.SalesStrings.MENU_RANK_FORMAT
+import resources.SalesStrings.MENU_SALES_TITLE
+import resources.SalesStrings.MONTHLY_SALES_TITLE
+import resources.SalesStrings.MONTHLY_TOTAL_SALES
+import resources.SalesStrings.MONTH_RANGE_ERROR
+import resources.SalesStrings.MONTH_SALES
+import resources.SalesStrings.NO_MENU_SALES_DATA
+import resources.SalesStrings.NO_MONTHLY_SALES_DATA
+import resources.SalesStrings.NO_ORDERS_TO_PAY
+import resources.SalesStrings.NO_ORDER_FOR_TABLE
+import resources.SalesStrings.NO_YEARLY_SALES_DATA
+import resources.SalesStrings.PAYMENT_CANCEL
+import resources.SalesStrings.PAYMENT_QUESTION
+import resources.SalesStrings.PAYMENT_TITLE
+import resources.SalesStrings.RETURN_TO_SALES_MANAGEMENT
+import resources.SalesStrings.SALES_REPORT_OPTIONS
+import resources.SalesStrings.SALES_REPORT_TITLE
+import resources.SalesStrings.SELECT_MONTH_PROMPT
+import resources.SalesStrings.SELECT_TABLE_TO_PAY
+import resources.SalesStrings.TABLES_WITH_ORDERS
+import resources.SalesStrings.TABLE_HEADER
+import resources.SalesStrings.TABLE_ORDER_DETAILS
+import resources.SalesStrings.TITLE
+import resources.SalesStrings.TOTAL_AMOUNT
+import resources.SalesStrings.TOTAL_PAYMENT_AMOUNT
+import resources.SalesStrings.TOTAL_YEAR_SALES
 import view.model.SalesViewModel
 import java.time.LocalDate
 
@@ -10,19 +50,19 @@ class SalesScreen(
     private val viewModel: SalesViewModel
 ) : BaseScreen {
     override fun display() {
-        println("======== 메출 관리 ========")
-        println("1.결제하기 2.매출확인 0. 홈이동")
-        println("==========================")
+        println(TITLE)
+        println(MENU_OPTIONS)
+        println(SEPARATOR_LINE)
     }
 
     override fun handleInput() {
-        print("\n선택 번호: ")
+        print("\n$SELECTION_PROMPT")
 
         when (readlnOrNull()) {
             "0" -> {
-                println("==========================")
-                println("          홈 이동          ")
-                println("==========================")
+                println(SEPARATOR_LINE)
+                println(HOME_NAVIGATION)
+                println(SEPARATOR_LINE)
 
                 navigate.navigateTo(ScreenType.Home)
             }
@@ -31,57 +71,57 @@ class SalesScreen(
 
             "2" -> showSalesReport()
 
-            else -> println("잘못된 입력입니다. 다시 선택해주세요.")
+            else -> println(INVALID_SELECTION)
         }
     }
 
     private fun processPayment() {
-        println("\n======== 결제 하기 ========")
+        println("\n$PAYMENT_TITLE")
 
         val allOrderList = viewModel.getAllOrder()
 
         if (allOrderList.isEmpty()) {
-            println("결제할 주문이 없습니다.")
-            print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+            println(NO_ORDERS_TO_PAY)
+            print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_SALES_MANAGEMENT)}")
             readlnOrNull()
             return
         }
 
-        println("\n=== 주문이 있는 테이블 목록 ===")
+        println("\n$TABLES_WITH_ORDERS")
 
         allOrderList.sortedBy { it.tableNumber }.forEach { order ->
-            println("  =${order.tableNumber}번 테이블=")
+            println(String.format(TABLE_HEADER, order.tableNumber))
 
             var totalPrice = 0
 
             order.menuItems.forEach { (menu, quantity) ->
-                println("  ${menu.name} - ${quantity}개")
+                println(String.format(MENU_BODY, menu.name, quantity))
                 totalPrice += menu.price * quantity
             }
-            println("  총 액: ${totalPrice}원\n")
+            println(String.format(TOTAL_AMOUNT, totalPrice))
         }
 
         try {
-            print("\n결제할 테이블번호: ")
+            print("\n$SELECT_TABLE_TO_PAY")
             val tableNumber = readln().toIntOrNull()
-            require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해주세요."}
+            require(tableNumber != null && tableNumber in 1..7) {INVALID_TABLE_NUMBER}
 
             val orderByTable = viewModel.getOrderByTable(tableNumber)
 
             if (orderByTable == null) {
-                println("${tableNumber}번 테이블에 결제할 주문이 없습니다.")
+                println(String.format(NO_ORDER_FOR_TABLE, tableNumber))
             } else {
                 val totalPriceByTable = orderByTable.menuItems.entries.sumOf { (menu, quantity) ->
                     menu.price * quantity
                 }
 
-                println("\n=== ${tableNumber}번 테이블 주문 내역 ===")
+                println("\n${String.format(TABLE_ORDER_DETAILS, tableNumber)}")
                 orderByTable.menuItems.forEach { (menu, quantity) ->
-                    println("${menu.name} - ${quantity}개")
+                    println(String.format(MENU_NAME_AMOUNT, menu.name, quantity))
                 }
-                println("\n총 결제 금액: ${totalPriceByTable}원")
+                println("\n${String.format(TOTAL_PAYMENT_AMOUNT, totalPriceByTable)}")
 
-                print("\n결제를 진행하시겠습니까? (Y/N): ")
+                print("\n$PAYMENT_QUESTION")
                 val confirm = readlnOrNull()?.trim()?.uppercase()
 
                 if (confirm == "Y") {
@@ -89,23 +129,23 @@ class SalesScreen(
 
                     println(sales.formatPaymentCompleteMessage())
                 } else {
-                    println("\n결제가 취소되었습니다.")
+                    println("\n$PAYMENT_CANCEL")
                 }
             }
         } catch (e: Exception) {
-            println("오류: ${e.message}")
+            println(String.format(ERROR_PREFIX, e.message))
         }
 
-        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_SALES_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun showSalesReport() {
-        println("\n======== 매출 확인 ========")
-        println("1.월별매출 2.일별매출 3.메뉴별매출")
-        println("==========================")
+        println("\n$SALES_REPORT_TITLE")
+        println(SALES_REPORT_OPTIONS)
+        println(SEPARATOR_LINE)
 
-        print("\n선택 번호: ")
+        print("\n$SELECTION_PROMPT")
 
         when (readlnOrNull()) {
             "1" -> showMonthlySales()
@@ -114,7 +154,7 @@ class SalesScreen(
 
             "3" -> showMenuSales()
 
-            else -> println("잘못된 입력입니다.")
+            else -> println(INVALID_SELECTION)
         }
     }
 
@@ -123,23 +163,25 @@ class SalesScreen(
         val currentMonth = LocalDate.now().monthValue
         val monthlySales = viewModel.getMonthlySales(currentYear)
 
-        println("\n======== ${currentYear}년 월별 매출 (1월~${currentMonth}월) ========")
+        println("\n${String.format(MONTHLY_SALES_TITLE, currentYear, currentMonth)}")
 
         if (monthlySales.isEmpty()) {
-            println("${currentYear}년 매출 데이터가 없습니다.")
+            println(String.format(NO_YEARLY_SALES_DATA, currentYear))
         } else {
             var totalYearToDateSales = 0
 
             for (month in 1..currentMonth) {
                 val sales = monthlySales[month] ?: 0
                 totalYearToDateSales += sales
-                println("${month}월: ${String.format("%,d", sales)}원")
+                val formatSales = String.format("%,d", sales)
+                println(String.format(MONTH_SALES, month, formatSales))
             }
 
-            println("\n${currentYear}년 ${currentMonth}월까지 총 매출: ${String.format("%,d", totalYearToDateSales)}원")
+            val formatTotalDateSales = String.format("%,d", totalYearToDateSales)
+            println(String.format(TOTAL_YEAR_SALES, currentYear, currentMonth, formatTotalDateSales))
         }
 
-        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_SALES_MANAGEMENT)}")
         readlnOrNull()
     }
 
@@ -147,22 +189,22 @@ class SalesScreen(
         val currentYear = LocalDate.now().year
         val currentMonth = LocalDate.now().monthValue
 
-        println("\n======== 일별 매출 조회 ========")
-        println("조회 가능한 월: 1월 ~ ${currentMonth}월")
-        print("조회할 월을 입력하세요 (1~${currentMonth}): ")
+        println("\n$DAILY_SALES_TITLE")
+        println(String.format(AVAILABLE_MONTHS, currentMonth))
+        print(String.format(SELECT_MONTH_PROMPT, currentMonth))
 
         try {
             val selectedMonth = readln().toIntOrNull()
             require(selectedMonth != null && selectedMonth in 1..currentMonth) {
-                "1월부터 ${currentMonth}월까지만 선택 가능합니다."
+                String.format(MONTH_RANGE_ERROR, currentMonth)
             }
 
             val dailySales = viewModel.getDailySales(currentYear, selectedMonth)
 
-            println("\n======== ${currentYear}년 ${selectedMonth}월 일별 매출 ========")
+            println("\n${String.format(DAILY_SALES_HEADER, currentYear, selectedMonth)}")
 
             if (dailySales.isEmpty()) {
-                println("${currentYear}년 ${selectedMonth}월 매출 데이터가 없습니다.")
+                println(String.format(NO_MONTHLY_SALES_DATA, currentYear, selectedMonth))
             } else {
                 val totalMonthSales = dailySales.values.sum()
                 val sortedDailySales = dailySales.toSortedMap()
@@ -179,19 +221,20 @@ class SalesScreen(
 
                     for (day in startDay..endDay) {
                         val sales = sortedDailySales[day] ?: 0
-                        weekSales.add("${day}일: ${String.format("%,d", sales)}원")
+                        val salesByDate = String.format("%,d", sales)
+                        weekSales.add(String.format(DAILY_SALES_FORMAT, day, salesByDate))
                     }
 
                     println(weekSales.joinToString(" | "))
                 }
-
-                println("\n${currentYear}년 ${selectedMonth}월 총 매출: ${String.format("%,d", totalMonthSales)}원")
+                val formatTotalMonthSales = String.format("%,d", totalMonthSales)
+                println(String.format(MONTHLY_TOTAL_SALES, currentYear, selectedMonth, formatTotalMonthSales))
             }
         } catch (e: Exception) {
-            println("오류: ${e.message}")
+            println(String.format(ERROR_PREFIX, e.message))
         }
 
-        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_SALES_MANAGEMENT)}")
         readlnOrNull()
     }
 
@@ -199,22 +242,23 @@ class SalesScreen(
         val currentYear = LocalDate.now().year
         val menuSales = viewModel.getMenuSales(currentYear)
 
-        println("\n======== ${currentYear}년 메뉴별 판매량 ========")
+        println("\n${String.format(MENU_SALES_TITLE, currentYear)}")
 
         if (menuSales.isEmpty()) {
-            println("${currentYear}년 메뉴 판매 데이터가 없습니다.")
+            println(String.format(NO_MENU_SALES_DATA, currentYear))
         } else {
             val sortedMenuSales = menuSales.toList().sortedByDescending { it.second }
 
             var rank = 1
             sortedMenuSales.forEach { (menu, quantity) ->
                 val totalRevenue = menu.price * quantity
-                println("${rank}위. ${menu.name} - 판매량:${quantity}개 / 총매출: ${String.format("%,d", totalRevenue)}원)")
+                val formatTotalRevenue = String.format("%,d", totalRevenue)
+                println(String.format(MENU_RANK_FORMAT, rank, menu.name, quantity, formatTotalRevenue))
                 rank++
             }
         }
 
-        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_SALES_MANAGEMENT)}")
         readlnOrNull()
     }
 }
