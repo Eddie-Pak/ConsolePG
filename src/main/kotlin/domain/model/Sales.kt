@@ -1,6 +1,10 @@
 package domain.model
 
 import data.dto.SalesDTO
+import resources.SalesStrings.PAYMENT_AMOUNT
+import resources.SalesStrings.PAYMENT_COMPLETE_TITLE
+import resources.SalesStrings.PAYMENT_TABLE
+import resources.SalesStrings.PAYMENT_TIME
 import java.time.LocalDate
 
 data class Sales(
@@ -22,10 +26,10 @@ data class Sales(
 
     fun formatPaymentCompleteMessage(): String {
         return """
-            === 결제가 완료되었습니다 ===
-            테이블: ${tableNumber}번
-            결제 금액: ${totalAmount}원
-            결제 시간: $paymentDate
+            $PAYMENT_COMPLETE_TITLE
+            ${String.format(PAYMENT_TABLE, tableNumber)}
+            ${String.format(PAYMENT_AMOUNT, totalAmount)}
+            ${String.format(PAYMENT_TIME, paymentDate)}
         """.trimIndent()
     }
 }
