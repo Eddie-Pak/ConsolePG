@@ -2,17 +2,22 @@ package view
 
 import navigate.Navigator
 import navigate.ScreenType
+import resources.CommonStrings.INVALID_SELECTION
+import resources.CommonStrings.SELECTION_PROMPT
+import resources.CommonStrings.SEPARATOR_LINE
+import resources.HomeStrings.MENU_OPTIONS
+import resources.HomeStrings.TITLE
 import kotlin.system.exitProcess
 
 class HomeScreen(private val navigate: Navigator) : BaseScreen {
     override fun display() {
-        println("======== 홈 화면 ========")
-        println("[1] 메뉴관리 [2]매장관리 [3]매출관리 [0] 종료")
-        println("==========================")
+        println(TITLE)
+        println(MENU_OPTIONS)
+        println(SEPARATOR_LINE)
     }
 
     override fun handleInput() {
-        print("\n선택 번호: ")
+        print("\n$SELECTION_PROMPT")
 
         when (readlnOrNull()) {
             "1" -> navigate.navigateTo(ScreenType.Menu)
@@ -23,7 +28,7 @@ class HomeScreen(private val navigate: Navigator) : BaseScreen {
 
             "0" -> exitProcess(0)
 
-            else -> println("잘못된 선택")
+            else -> println(INVALID_SELECTION)
         }
     }
 }
