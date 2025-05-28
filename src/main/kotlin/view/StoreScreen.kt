@@ -56,56 +56,50 @@ class StoreScreen(
 
         if (menuList.isEmpty()) {
             println("주문 가능한 메뉴가 없습니다.")
-            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
-            readlnOrNull()
-            return
-        }
+        } else {
+            try {
+                print("\n테이블 번호 (1~7): ")
+                val tableNumber = readln().toIntOrNull()
+                require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해 주세요."}
 
-        try {
-            print("\n테이블 번호 (1~7): ")
-            val tableNumber = readln().toIntOrNull()
-            require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해 주세요."}
-
-            println("\n=== 메뉴 목록 ===")
-            menuList.forEachIndexed { index, menu ->
-                println("${index + 1}. ${menu.name} - ${menu.price}원")
-            }
-
-            println("\n주문을 입력해주세요.")
-            println("형식: 메뉴번호-수량, 메뉴번호-수량 (예: 1-2, 3-1)")
-            print("주문: ")
-
-            val orderInput = readlnOrNull() ?: ""
-            require(orderInput.isNotEmpty()) { "주문을 입력해주세요." }
-
-            val menuItems = parseOrder(orderInput, menuList)
-            require(menuItems.isNotEmpty()) { "올바른 주문 형식을 입력해주세요." }
-
-            val newOrder = viewModel.addOrder(tableNumber, menuItems)
-
-            println("\n=== 주문이 완료되었습니다 ===")
-            println("테이블 번호: ${newOrder.tableNumber}번 주문내용")
-
-            menuItems.forEach { (menuId, quantity) ->
-                val menu = menuList.find { it.id == menuId }
-                menu?.let {
-                    println("${menu.name} - $quantity")
+                println("\n=== 메뉴 목록 ===")
+                menuList.forEachIndexed { index, menu ->
+                    println("${index + 1}. ${menu.name} - ${menu.price}원")
                 }
+
+                println("\n주문을 입력해주세요. 형식: 메뉴번호-수량, 메뉴번호-수량 (예: 1-2, 3-1)")
+                print("${tableNumber}번 테이블 주문: ")
+
+                val orderInput = readln()
+                require(orderInput.isNotEmpty()) { "주문을 입력해주세요." }
+
+                val menuItems = parseOrder(orderInput, menuList)
+                require(menuItems.isNotEmpty()) { "올바른 주문 형식을 입력해주세요." }
+
+                val newOrder = viewModel.addOrder(tableNumber, menuItems)
+
+                println("\n=== 주문이 완료되었습니다 ===")
+                println("테이블 번호: ${newOrder.tableNumber}번 주문내용")
+
+                menuItems.forEach { (menuId, quantity) ->
+                    val menu = menuList.find { it.id == menuId }
+                    menu?.let {
+                        println("${menu.name} - $quantity")
+                    }
+                }
+
+                val totalPrice = newOrder.menuItems.entries.sumOf { (menu, quantity) ->
+                    menu.price * quantity
+                }
+
+                println("\n테이블 총 금액: ${totalPrice}원")
+            } catch (e: Exception) {
+                println("${e.message}")
             }
-
-            val totalPrice = newOrder.menuItems.entries.sumOf { (menu, quantity) ->
-                menu.price * quantity
-            }
-
-            println("\n테이블 총 금액: ${totalPrice}원")
-
-            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
-            readlnOrNull()
-        } catch (e: Exception) {
-            println("${e.message}")
-            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
-            readlnOrNull()
         }
+
+        print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+        readlnOrNull()
     }
 
     private fun updateOrder() {
@@ -194,7 +188,7 @@ class StoreScreen(
             val quantity = parts[1].toIntOrNull()
 
             require(menuIndex != null && menuIndex in 1..menuList.size) {
-                "유효한 메뉴 번호(1-${menuList.size})를 입력해주세요."
+                "유효한 메뉴 번호(1-${menuList.size})를 형식에 맞게 입력해주세요."
             }
 
             require(quantity != null && quantity > 0) { "수량은 1 이상이어야 합니다." }

@@ -90,17 +90,13 @@ class StoreRepositoryImpl(
 
         if (updatedMenuItems.isEmpty()) {
             orderDtoList.removeAt(orderIndex)
+            storeDataSource.saveOrderData(orderDtoList)
+            return null
         } else {
             val updatedOrder = existingOrder.copy(menuItemId = updatedMenuItems)
             orderDtoList[orderIndex] = updatedOrder
-        }
-
-        storeDataSource.saveOrderData(orderDtoList)
-
-        return if (updatedMenuItems.isEmpty()) {
-            null
-        } else {
-            orderDtoList[orderIndex].toDomain(allMenu)
+            storeDataSource.saveOrderData(orderDtoList)
+            return updatedOrder.toDomain(allMenu)
         }
     }
 }
