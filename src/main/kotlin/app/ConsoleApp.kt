@@ -1,3 +1,5 @@
+package app
+
 import navigate.AppNavigator
 import view.ConsoleController
 
