@@ -43,10 +43,12 @@ class MenuRepositoryImpl(private val dataSource: MenuDataSource) : MenuRepositor
 
         val index = menuDtoList.indexOfFirst { it.id == id }
 
+        if (index == -1) {
+            return false
+        }
+
         menuDtoList.removeAt(index)
 
-        dataSource.saveMenuData(menuDtoList)
-
-        return true
+        return dataSource.saveMenuData(menuDtoList)
     }
 }

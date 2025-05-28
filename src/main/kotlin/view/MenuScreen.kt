@@ -7,7 +7,7 @@ import view.model.MenuViewModel
 
 class MenuScreen(
     private val navigate: Navigator,
-    private val viewModel: MenuViewModel
+    private val viewModel: MenuViewModel,
 ) : BaseScreen {
     override fun display() {
         println("======== 메뉴 관리 ========")
@@ -61,15 +61,15 @@ class MenuScreen(
         try {
             print("메뉴이름을 입력해주세요: ")
             val menuName = readlnOrNull() ?: ""
-            require(menuName.isNotEmpty()) {"\n메뉴이름을 입력해주세요.\n"}
+            require(menuName.isNotEmpty()) { "\n메뉴이름을 입력해주세요.\n" }
 
             print("메뉴가격을 입력해주세요: ")
-            val price = readlnOrNull()?.toIntOrNull()
-            require(price != null && price > 0) {"\n올바른 가격을 입력해주세요.\n"}
+            val price = readln().toIntOrNull()
+            require(price != null && price > 0) { "\n올바른 가격을 입력해주세요.\n" }
 
             val addMenu = viewModel.addMenu(menuName, price)
 
-            println("${addMenu.name}을(를) 메뉴에 추가 하였습니다.")
+            println("(${addMenu.name} - ${addMenu.price}원) 을(를) 메뉴에 추가 하였습니다.")
             println()
         } catch (e: Exception) {
             println("오류: ${e.message}")
@@ -93,16 +93,16 @@ class MenuScreen(
 
             try {
                 print("\n수정할 메뉴 번호: ")
-                val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) {"유효한 메뉴 번호를 입력해주세요."}
+                val menuIndex = readln().toIntOrNull() ?: 0
+                require(menuIndex in 1..menuList.size) { "유효한 메뉴 번호를 입력해주세요." }
 
                 val selectedMenu = menuList[menuIndex - 1]
 
                 println("\n선택한 메뉴: ${selectedMenu.name} - ${selectedMenu.price}원")
 
                 print("새 가격: ")
-                val newPrice = readlnOrNull()?.toIntOrNull()
-                require(newPrice != null && newPrice > 0) {"올바른 가격을 입력해 주세요."}
+                val newPrice = readln().toIntOrNull()
+                require(newPrice != null && newPrice > 0) { "올바른 가격을 입력해 주세요." }
 
                 val updateMenu = viewModel.updateMenu(selectedMenu.id, newPrice)
 
@@ -132,18 +132,21 @@ class MenuScreen(
 
             try {
                 print("\n삭제할 메뉴 번호:")
-                val menuIndex = readlnOrNull()?.toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) {"유효한 번호를 입력하세요."}
+                val menuIndex = readln().toIntOrNull() ?: 0
+                require(menuIndex in 1..menuList.size) { "유효한 번호를 입력하세요." }
 
                 val selectMenu = menuList[menuIndex - 1]
 
                 println("${selectMenu.name} 을(를) 삭제합니다.")
                 println("삭 제 중.......")
 
-                if (viewModel.deleteMenu(selectMenu.id)) {
-                    println("\n${selectMenu.name} 을(를) 삭제하였습니다.")
-                }
+                val isDelete = viewModel.deleteMenu(selectMenu.id)
 
+                if (isDelete) {
+                    println("\n${selectMenu.name} 을(를) 삭제하였습니다.")
+                } else {
+                    println("\n삭제중 오류가 발생하였습니다. 잠시 후 다시 시도해주세요.")
+                }
             } catch (e: Exception) {
                 println("오류: ${e.message}")
             }
