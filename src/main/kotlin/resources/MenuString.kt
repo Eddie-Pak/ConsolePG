@@ -5,7 +5,8 @@ object MenuStrings {
     const val MENU_OPTIONS = "1.메뉴확인 2.메뉴추가 3.메뉴수정 4.메뉴삭제 0.홈이동"
     const val RETURN_TO_MENU_MANAGEMENT = "메뉴관리"
     const val VALID_MENU_NUMBER_REQUIRED = "유효한 메뉴 번호를 입력해주세요."
-    const val MENU_DISPLAY_FORMAT = "%d. %s - %d원"
+    const val MENU_DISPLAY_FORMAT = "%s - %d원"
+    const val MENU_LIST_DISPLAY_FORMAT = "%d. %s - %d원"
 
     // 메뉴 목록
     const val MENU_LIST_TITLE = "======== 메뉴 목록 ========"
