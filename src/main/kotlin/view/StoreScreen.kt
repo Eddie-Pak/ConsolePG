@@ -163,16 +163,12 @@ class StoreScreen(
                 }
                 println("\n새로운 총 금액: ${newTotalPrice}원")
             }
-
-            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
-            readlnOrNull()
-
         } catch (e: Exception) {
             println("오류: ${e.message}")
-            print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
-            readlnOrNull()
         }
 
+        print("\n엔터키를 누르면 매장관리로 돌아갑니다.")
+        readlnOrNull()
     }
 
     private fun parseOrder(input: String, menuList: List<Menu>): Map<Int, Int> {
