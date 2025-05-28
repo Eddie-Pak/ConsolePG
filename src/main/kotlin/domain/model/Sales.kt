@@ -19,21 +19,13 @@ data class Sales(
             paymentDate = this.paymentDate.toString()
         )
     }
-}
 
-fun List<Sales>.formatForDisplay(): String {
-    if (this.isEmpty()) {
-        return "결제 내역이 없습니다."
-    }
-
-    return this.joinToString("\n") { payment ->
-        val header = "===== 결제테이블 ${payment.tableNumber}번 ====="
-        val date = "날짜: ${payment.paymentDate}"
-        val menuItems = payment.menuItems.entries.joinToString("\n") { (menu, quantity) ->
-            "  ${menu.name} - ${quantity}개"
-        }
-        val total = "총 결제 금액: ${payment.totalAmount}원"
-
-        "$header\n$date\n$menuItems\n\n$total"
+    fun formatPaymentCompleteMessage(): String {
+        return """
+            === 결제가 완료되었습니다 ===
+            테이블: ${tableNumber}번
+            결제 금액: ${totalAmount}원
+            결제 시간: $paymentDate
+        """.trimIndent()
     }
 }

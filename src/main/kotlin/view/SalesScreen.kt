@@ -67,41 +67,37 @@ class SalesScreen(
             require(tableNumber != null && tableNumber in 1..7) {"유효한 테이블 번호를 입력해주세요."}
 
             val orderByTable = viewModel.getOrderByTable(tableNumber)
+
             if (orderByTable == null) {
                 println("${tableNumber}번 테이블에 결제할 주문이 없습니다.")
-                print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
-                readlnOrNull()
-                return
-            }
-
-            val totalPriceByTable = orderByTable.menuItems.entries.sumOf { (menu, quantity) ->
-                menu.price * quantity
-            }
-
-            println("\n=== ${tableNumber}번 테이블 주문 내역 ===")
-            orderByTable.menuItems.forEach { (menu, quantity) ->
-                println("${menu.name} - ${quantity}개")
-            }
-            println("\n총 결제 금액: ${totalPriceByTable}원")
-
-            print("\n결제를 진행하시겠습니까? (Y/N): ")
-            val confirm = readlnOrNull()?.trim()?.uppercase()
-
-            if (confirm == "Y") {
-                val sales = viewModel.processPayment(tableNumber)
-
-                println("\n=== 결제가 완료되었습니다 ===")
-                println("테이블: ${sales.tableNumber}번")
-                println("결제 금액: ${sales.totalAmount}원")
-                println("결제 시간: ${sales.paymentDate}")
-                println()
             } else {
-                println("\n결제가 취소되었습니다.")
-            }
+                val totalPriceByTable = orderByTable.menuItems.entries.sumOf { (menu, quantity) ->
+                    menu.price * quantity
+                }
 
+                println("\n=== ${tableNumber}번 테이블 주문 내역 ===")
+                orderByTable.menuItems.forEach { (menu, quantity) ->
+                    println("${menu.name} - ${quantity}개")
+                }
+                println("\n총 결제 금액: ${totalPriceByTable}원")
+
+                print("\n결제를 진행하시겠습니까? (Y/N): ")
+                val confirm = readlnOrNull()?.trim()?.uppercase()
+
+                if (confirm == "Y") {
+                    val sales = viewModel.processPayment(tableNumber)
+
+                    println(sales.formatPaymentCompleteMessage())
+                } else {
+                    println("\n결제가 취소되었습니다.")
+                }
+            }
         } catch (e: Exception) {
             println("오류: ${e.message}")
         }
+
+        print("\n엔터키를 누르면 매출관리로 돌아갑니다.")
+        readlnOrNull()
     }
 
     private fun showSalesReport() {
