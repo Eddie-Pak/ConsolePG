@@ -3,6 +3,38 @@ package view
 import domain.model.formatForDisplay
 import navigate.Navigator
 import navigate.ScreenType
+import resources.CommonStrings.ENTER_TO_CONTINUE
+import resources.CommonStrings.ERROR_PREFIX
+import resources.CommonStrings.HOME_NAVIGATION
+import resources.CommonStrings.INVALID_SELECTION
+import resources.CommonStrings.SELECTION_PROMPT
+import resources.CommonStrings.SEPARATOR_LINE
+import resources.MenuStrings.ADD_MENU_TITLE
+import resources.MenuStrings.DELETE_MENU_TITLE
+import resources.MenuStrings.ENTER_MENU_NAME
+import resources.MenuStrings.ENTER_MENU_PRICE
+import resources.MenuStrings.ENTER_NEW_PRICE
+import resources.MenuStrings.MENU_ADDED_SUCCESS
+import resources.MenuStrings.MENU_DELETE_CONFIRM
+import resources.MenuStrings.MENU_DELETE_ERROR
+import resources.MenuStrings.MENU_DELETE_SUCCESS
+import resources.MenuStrings.MENU_LIST_TITLE
+import resources.MenuStrings.MENU_NAME_REQUIRED
+import resources.MenuStrings.MENU_OPTIONS
+import resources.MenuStrings.MENU_UPDATE_SUCCESS
+import resources.MenuStrings.NO_MENU_AVAILABLE
+import resources.MenuStrings.NO_MENU_TO_DELETE
+import resources.MenuStrings.NO_MENU_TO_UPDATE
+import resources.MenuStrings.PRICE_CHANGE_FORMAT
+import resources.MenuStrings.RETURN_TO_MENU_MANAGEMENT
+import resources.MenuStrings.SELECTED_MENU
+import resources.MenuStrings.SELECT_MENU_TO_DELETE
+import resources.MenuStrings.SELECT_MENU_TO_UPDATE
+import resources.MenuStrings.TITLE
+import resources.MenuStrings.UPDATE_MENU_TITLE
+import resources.MenuStrings.VALID_MENU_NUMBER_REQUIRED
+import resources.MenuStrings.VALID_PRICE_INPUT_REQUIRED
+import resources.MenuStrings.VALID_PRICE_REQUIRED
 import view.model.MenuViewModel
 
 class MenuScreen(
@@ -10,19 +42,19 @@ class MenuScreen(
     private val viewModel: MenuViewModel,
 ) : BaseScreen {
     override fun display() {
-        println("======== 메뉴 관리 ========")
-        println("1.메뉴확인 2.메뉴추가 3.메뉴수정 4.메뉴삭제 0.홈이동")
-        println("==========================")
+        println(TITLE)
+        println(MENU_OPTIONS)
+        println(SEPARATOR_LINE)
     }
 
     override fun handleInput() {
-        print("\n선택 번호: ")
+        print("\n$SELECTION_PROMPT")
 
         when (readlnOrNull()) {
             "0" -> {
-                println("==========================")
-                println("          홈 이동          ")
-                println("==========================")
+                println(SEPARATOR_LINE)
+                println(HOME_NAVIGATION)
+                println(SEPARATOR_LINE)
 
                 navigate.navigateTo(ScreenType.Home)
             }
@@ -35,123 +67,122 @@ class MenuScreen(
 
             "4" -> deleteMenu()
 
-            else -> println("잘못된 입력")
+            else -> println(INVALID_SELECTION)
         }
     }
 
     private fun getAllMenu() {
-        println("\n======== 메뉴 목록 ========")
+        println("\n$MENU_LIST_TITLE")
 
         val menuList = viewModel.getMenuList()
 
         if (menuList.isEmpty()) {
-            println("등록된 메뉴가 없습니다.")
+            println(NO_MENU_AVAILABLE)
             println()
         } else {
             println(menuList.formatForDisplay())
         }
 
-        print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_MENU_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun addMenu() {
-        println("\n======== 메뉴 추가 ========")
+        println("\n$ADD_MENU_TITLE")
 
         try {
-            print("메뉴이름을 입력해주세요: ")
+            print(ENTER_MENU_NAME)
             val menuName = readlnOrNull() ?: ""
-            require(menuName.isNotEmpty()) { "\n메뉴이름을 입력해주세요.\n" }
+            require(menuName.isNotEmpty()) { "\n$MENU_NAME_REQUIRED\n" }
 
-            print("메뉴가격을 입력해주세요: ")
+            print(ENTER_MENU_PRICE)
             val price = readln().toIntOrNull()
-            require(price != null && price > 0) { "\n올바른 가격을 입력해주세요.\n" }
+            require(price != null && price > 0) { "\n$VALID_PRICE_REQUIRED\n" }
 
             val addMenu = viewModel.addMenu(menuName, price)
 
-            println("(${addMenu.name} - ${addMenu.price}원) 을(를) 메뉴에 추가 하였습니다.")
+            println(String.format(MENU_ADDED_SUCCESS, addMenu.name, addMenu.price))
             println()
         } catch (e: Exception) {
-            println("오류: ${e.message}")
+            println(String.format(ERROR_PREFIX, e.message))
         }
 
-        print("엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_MENU_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun updateMenu() {
-        println("\n======== 메뉴 수정 ========")
+        println("\n$UPDATE_MENU_TITLE")
         println()
 
         val menuList = viewModel.getMenuList()
 
         if (menuList.isEmpty()) {
-            println("수정할 메뉴가 없습니다.")
+            println(NO_MENU_TO_UPDATE)
             println()
         } else {
             println(menuList.formatForDisplay())
 
             try {
-                print("\n수정할 메뉴 번호: ")
+                print("\n$SELECT_MENU_TO_UPDATE")
                 val menuIndex = readln().toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) { "유효한 메뉴 번호를 입력해주세요." }
+                require(menuIndex in 1..menuList.size) { "\n$VALID_MENU_NUMBER_REQUIRED\n" }
 
                 val selectedMenu = menuList[menuIndex - 1]
 
-                println("\n선택한 메뉴: ${selectedMenu.name} - ${selectedMenu.price}원")
+                println("\n${String.format(SELECTED_MENU, selectedMenu.name, selectedMenu.price)}")
 
-                print("새 가격: ")
+                print(ENTER_NEW_PRICE)
                 val newPrice = readln().toIntOrNull()
-                require(newPrice != null && newPrice > 0) { "올바른 가격을 입력해 주세요." }
+                require(newPrice != null && newPrice > 0) { "\n$VALID_PRICE_INPUT_REQUIRED\n" }
 
                 val updateMenu = viewModel.updateMenu(selectedMenu.id, newPrice)
 
-                println("\n메뉴가 수정되었습니다.")
-                println("${updateMenu.name}: ${selectedMenu.price}원 -> ${updateMenu.price}원")
+                println("\n$MENU_UPDATE_SUCCESS")
+                println(String.format(PRICE_CHANGE_FORMAT, updateMenu.name, selectedMenu.price, updateMenu.price))
 
             } catch (e: Exception) {
-                println("오류: ${e.message}")
+                println(String.format(ERROR_PREFIX, e.message))
             }
         }
 
-        print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+        print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_MENU_MANAGEMENT)}")
         readlnOrNull()
     }
 
     private fun deleteMenu() {
-        println("\n======== 메뉴 목록 ========")
+        println("\n$DELETE_MENU_TITLE")
         println()
 
         val menuList = viewModel.getMenuList()
 
         if (menuList.isEmpty()) {
-            println("삭제할 메뉴가 없습니다.")
+            println(NO_MENU_TO_DELETE)
             println()
         } else {
             println(menuList.formatForDisplay())
 
             try {
-                print("\n삭제할 메뉴 번호:")
+                print("\n$SELECT_MENU_TO_DELETE")
                 val menuIndex = readln().toIntOrNull() ?: 0
-                require(menuIndex in 1..menuList.size) { "유효한 번호를 입력하세요." }
+                require(menuIndex in 1..menuList.size) { "\n$VALID_MENU_NUMBER_REQUIRED\n" }
 
                 val selectMenu = menuList[menuIndex - 1]
 
-                println("${selectMenu.name} 을(를) 삭제합니다.")
-                println("삭 제 중.......")
+                println(String.format(MENU_DELETE_CONFIRM, selectMenu.name))
 
                 val isDelete = viewModel.deleteMenu(selectMenu.id)
 
                 if (isDelete) {
-                    println("\n${selectMenu.name} 을(를) 삭제하였습니다.")
+                    println("\n${String.format(MENU_DELETE_SUCCESS, selectMenu.name)}")
                 } else {
-                    println("\n삭제중 오류가 발생하였습니다. 잠시 후 다시 시도해주세요.")
+                    println("\n$MENU_DELETE_ERROR")
                 }
             } catch (e: Exception) {
-                println("오류: ${e.message}")
+                println(String.format(ERROR_PREFIX, e.message))
             }
 
-            print("\n엔터키를 누르면 메뉴관리로 돌아갑니다.")
+            print("\n${String.format(ENTER_TO_CONTINUE, RETURN_TO_MENU_MANAGEMENT)}")
             readlnOrNull()
         }
     }

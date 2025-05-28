@@ -1,6 +1,7 @@
 package domain.model
 
 import data.dto.MenuDTO
+import resources.MenuStrings.MENU_DISPLAY_FORMAT
 
 data class Menu(
     val id: Int,
@@ -18,6 +19,6 @@ data class Menu(
 
 fun List<Menu>.formatForDisplay(): String {
     return this.mapIndexed() { index, menu ->
-        "${index + 1}. ${menu.name} - ${menu.price}원"
+        String.format(MENU_DISPLAY_FORMAT,index + 1, menu.name, menu.price)
     }.joinToString("\n")
 }
