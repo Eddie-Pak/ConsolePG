@@ -1,14 +1,16 @@
 package navigate
 
-import di.DIProvider
+import di.DIContainer
 import view.*
 
 class AppNavigator: Navigator {
     private var currentScreen: BaseScreen
 
-    private val menuViewModel = DIProvider.menuViewModel
-    private val storeViewModel = DIProvider.storeViewModel
-    private val salesViewModel = DIProvider.salesViewModel
+    private val di = DIContainer.provider
+
+    private val menuViewModel = di.menuViewModel
+    private val storeViewModel = di.storeViewModel
+    private val salesViewModel = di.salesViewModel
 
     private val homeScreen = HomeScreen(this)
     private val menuScreen = MenuScreen(this, menuViewModel)

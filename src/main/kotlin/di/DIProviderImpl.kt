@@ -11,7 +11,7 @@ import view.model.MenuViewModel
 import view.model.SalesViewModel
 import view.model.StoreViewModel
 
-object DIProvider {
+class DIProviderImpl : DiProvider {
     private val menuDataSource: MenuDataSource by lazy { MenuDataSourceImpl() }
     private val storeDataSource: StoreDataSource by lazy { StoreDataSourceImpl() }
     private val salesDataSource: SalesDataSource by lazy { SalesDataSourceImpl() }
@@ -20,7 +20,7 @@ object DIProvider {
     private val storeRepository: StoreRepository by lazy { StoreRepositoryImpl(menuDataSource, storeDataSource) }
     private val salesRepository: SalesRepository by lazy { SalesRepositoryImpl(menuDataSource, storeDataSource, salesDataSource) }
 
-    val menuViewModel: MenuViewModel by lazy { MenuViewModel(menuRepository) }
-    val storeViewModel: StoreViewModel by lazy { StoreViewModel(storeRepository) }
-    val salesViewModel: SalesViewModel by lazy { SalesViewModel(salesRepository) }
+    override val menuViewModel: MenuViewModel by lazy { MenuViewModel(menuRepository) }
+    override val storeViewModel: StoreViewModel by lazy { StoreViewModel(storeRepository) }
+    override val salesViewModel: SalesViewModel by lazy { SalesViewModel(salesRepository) }
 }
