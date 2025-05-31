@@ -48,5 +48,5 @@ object SalesStrings {
     // 메뉴별 매출
     const val MENU_SALES_TITLE = "======== %d년 메뉴별 판매량 ========"
     const val NO_MENU_SALES_DATA = "%d년 메뉴 판매 데이터가 없습니다."
-    const val MENU_RANK_FORMAT = "%d위. %s - 판매량:%d개 / 총매출: %s원)"
+    const val MENU_RANK_FORMAT = "%d위. %s - 판매량:%d개 / 총매출: %s원"
 }

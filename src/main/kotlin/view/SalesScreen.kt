@@ -99,6 +99,7 @@ class SalesScreen(
                 totalPrice += menu.price * quantity
             }
             println(String.format(TOTAL_AMOUNT, totalPrice))
+            println()
         }
 
         try {
@@ -127,7 +128,7 @@ class SalesScreen(
                 if (confirm == "Y") {
                     val sales = viewModel.processPayment(tableNumber)
 
-                    println(sales.formatPaymentCompleteMessage())
+                    println("\n${sales.formatPaymentCompleteMessage()}")
                 } else {
                     println("\n$PAYMENT_CANCEL")
                 }
@@ -178,6 +179,7 @@ class SalesScreen(
             }
 
             val formatTotalDateSales = String.format("%,d", totalYearToDateSales)
+            println()
             println(String.format(TOTAL_YEAR_SALES, currentYear, currentMonth, formatTotalDateSales))
         }
 
@@ -228,6 +230,7 @@ class SalesScreen(
                     println(weekSales.joinToString(" | "))
                 }
                 val formatTotalMonthSales = String.format("%,d", totalMonthSales)
+                println()
                 println(String.format(MONTHLY_TOTAL_SALES, currentYear, selectedMonth, formatTotalMonthSales))
             }
         } catch (e: Exception) {
