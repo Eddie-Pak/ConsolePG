@@ -250,7 +250,9 @@ class SalesScreen(
         if (menuSales.isEmpty()) {
             println(String.format(NO_MENU_SALES_DATA, currentYear))
         } else {
-            val sortedMenuSales = menuSales.toList().sortedByDescending { it.second }
+            val sortedMenuSales = menuSales.toList().sortedByDescending { (menu, quantity) ->
+                menu.price * quantity
+            }
 
             var rank = 1
             sortedMenuSales.forEach { (menu, quantity) ->
